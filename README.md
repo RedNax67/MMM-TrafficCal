@@ -46,14 +46,17 @@ Here is an example of an entry in `config.js`
 },
 ```
 
+It's advisable to create an extra calendar just for trips so you can set maximumNumberOfDays: 1 for it and just get todays commutes. You can hide this extra calender so it won't be displayed on your mirror but will still drive this module.
+
+
 ## Dependencies
 - [request](https://www.npmjs.com/package/request) (installed via `npm install`)
 - [calendar] You'll need to add entries in your calendar starting with the tripkey keyword and the full (google suggested) address for your destination. Add the text you want prepended in the remarks field in the appointment.
 
 
 ## Important Notes
-- This project is based upon MMM-Traffic by Sam Lewis git clone https://github.com/SamLewis0602/MMM-Traffic.git 
-- This module needs the calendar event broadcast feature currently in the development branch.
+- This project is based upon MMM-Traffic by Sam Lewis https://github.com/SamLewis0602/MMM-Traffic.git 
+- This module needs the calendar event broadcast feature currently in the development branch. 
 
 
 ## Special Thanks
