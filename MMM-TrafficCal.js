@@ -92,7 +92,8 @@ Module.register('MMM-TrafficCal', {
 		commuteInfo.className = 'small';
 
         if (!this.loaded) {
-            wrapper.innerHTML = this.config.loadingText;
+            // wrapper.innerHTML = this.config.loadingText;
+            wrapper.innerHTML = "";
             return wrapper;
         }
 

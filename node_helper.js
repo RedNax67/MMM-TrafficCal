@@ -26,6 +26,19 @@ module.exports = NodeHelper.create({
         var descriptions = [];
         var reqdone = 0;
         //console.log("Payload: " + payload);
+        
+        if (payload[0].length === 0 ) {
+            self.sendSocketNotification('TRAFFIC_COMMUTE', {
+                'commutes': commutes,
+                'trafficComparisons': trafficComparisons,
+                'summaries': summaries,
+                'noTraffics': noTraffics,
+                'withTraffics': withTraffics,
+                'destinations': destinations,
+                'descriptions': descriptions
+            });
+            
+        } else {
 
         for (var e in payload[0]) {
 
@@ -97,6 +110,7 @@ module.exports = NodeHelper.create({
 
             );
 
+        }
         }
 
     },
