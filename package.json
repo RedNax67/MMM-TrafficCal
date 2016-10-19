@@ -1,0 +1,25 @@
+{
+  "name": "Magic-Mirror-Module-Traffic",
+  "version": "1.0.0",
+  "description": "Google Maps Traffic module for the Magic Mirror.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RedNax67/MMM-TrafficCal"
+  },
+  "keywords": [
+    "magic mirror",
+    "smart mirror",
+    "traffic",
+    "module"
+  ],
+  "author": "RedNax",
+  "contributors": "https://github.com/RedNax67/MMM-TrafficCal/graphs/contributors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RedNax67/MMM-TrafficCal/issues"
+  },
+  "homepage": "https://github.com/RedNax67/MMM-TrafficCal#readme",
+  "dependencies": {
+    "request": "latest"
+    }
+}
