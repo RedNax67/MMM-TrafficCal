@@ -87,9 +87,8 @@ module.exports = NodeHelper.create({
                                 descriptions.push(payload[2][f]);
                             }
                         }
-
-                        //console.log("commutes: " + commutes);
-                        //console.log("descs: " + e + " " + descriptions);
+                        
+                        console.log("TrafficCal Dest: " + destination);
 
 
                         if (commutes.length == payload[0].length) {

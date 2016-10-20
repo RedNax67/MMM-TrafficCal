@@ -139,7 +139,7 @@ Module.register('MMM-TrafficCal', {
     getParams: function() {
         var params = '?';
         params += 'mode=' + this.config.mode;
-        params += '&origin=' + this.config.origin;
+        // params += '&origin=' + this.config.origin;
         params += '&key=' + this.config.api_key;
         params += '&traffic_model=' + this.config.traffic_model;
         params += '&departure_time=now';
@@ -180,11 +180,14 @@ Module.register('MMM-TrafficCal', {
                 this.url = 'https://maps.googleapis.com/maps/api/directions/json' + this.getParams();
                 for (var e in payload) {""
                     var event = payload[e];
+                    var infos = event.description.split(":");
+                    var origin = infos[1] || this.config.origin;
+                    var description = infos[0]  || false;
                     if (event.title.substring(0,6) === this.config.tripkey) {
                         if (this.dests.indexOf(event.location) === -1) { //Prevent duplicate entries
-                            this.urls.push(this.url + '&destination=' + event.location);
+                            this.urls.push(this.url + '&destination=' + event.location + '&origin=' + origin );
                             this.dests.push(event.location);
-                            this.descs.push(event.description);
+                            this.descs.push(description);
                         }
                     }
                 }
