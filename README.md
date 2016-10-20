@@ -47,6 +47,7 @@ Here is an example of an entry in `config.js`
 ```
 
 It's advisable to create an extra calendar just for trips so you can set maximumNumberOfDays: 1 for it and just get todays commutes. You can hide this extra calender so it won't be displayed on your mirror but will still drive this module.
+In the description field of the appointment you can enter: [[commutealias]:[alternate commute origin]]. The alternate origin could be useful to show people at home/mirror location how long your incoming commute will take.
 
 
 ## Dependencies
