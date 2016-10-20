@@ -24,6 +24,7 @@ module.exports = NodeHelper.create({
         var destinations = [];
         var api_urls = [];
         var descriptions = [];
+        var modes = [];
         var reqdone = 0;
         //console.log("Payload: " + payload);
         
@@ -35,7 +36,9 @@ module.exports = NodeHelper.create({
                 'noTraffics': noTraffics,
                 'withTraffics': withTraffics,
                 'destinations': destinations,
-                'descriptions': descriptions
+                'descriptions': descriptions,
+                'modes': modes
+
             });
             
         } else {
@@ -57,6 +60,8 @@ module.exports = NodeHelper.create({
 
                         if (JSON.parse(body).status == 'OK') {
 
+                            console.log("Body: "  + body);
+                            
                             if (JSON.parse(body).routes[0].legs[0].duration_in_traffic) {
                                 var commute = JSON.parse(body).routes[0].legs[0].duration_in_traffic.text;
                                 var noTrafficValue = JSON.parse(body).routes[0].legs[0].duration.value;
@@ -66,13 +71,16 @@ module.exports = NodeHelper.create({
                                 trafficComparison = parseInt(withTrafficValue) / parseInt(noTrafficValue);
                                 var summary = JSON.parse(body).routes[0].summary;
                                 var destination = JSON.parse(body).routes[0].legs[0].end_address;
-
+                                var tmode = "driving";
                             } else {
                                 var commute = JSON.parse(body).routes[0].legs[0].duration.text;
+                                var destination = JSON.parse(body).routes[0].legs[0].end_address;
+                                var tmode = "transit";
                             }
                         } else {
                             var commute = JSON.parse(body).error_message;
                             var summary = JSON.parse(body).status;
+                            
                         }
 
                         commutes.push(commute);
@@ -81,6 +89,7 @@ module.exports = NodeHelper.create({
                         noTraffics.push(noTraffic);
                         withTraffics.push(withTraffic);
                         destinations.push(destination);
+                        modes.push(tmode);
 
                         for (var f in payload[1]) {
                             if (payload[1][f] === destination) {
@@ -99,7 +108,8 @@ module.exports = NodeHelper.create({
                                 'noTraffics': noTraffics,
                                 'withTraffics': withTraffics,
                                 'destinations': destinations,
-                                'descriptions': descriptions
+                                'descriptions': descriptions,
+                                'modes': modes
                             });
                         }
 

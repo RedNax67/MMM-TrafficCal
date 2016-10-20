@@ -109,12 +109,16 @@ Module.register('MMM-TrafficCal', {
             table.appendChild(row);
 
             var symbol = document.createElement('td');
-            symbol.className = this.symbols[this.config.mode] + ' symbol';
+            symbol.className = this.symbols[mycommute.mode] + ' symbol';
             row.appendChild(symbol);
 
             var commuteCell = document.createElement("td");
-            commuteCell.className = "c";
-            commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute + ' ipv ' + mycommute.noTraffic + ' via ' + mycommute.summary;
+            //commuteCell.className = "c";
+            if (mycommute.noTraffic) {
+                commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute + ' ipv ' + mycommute.noTraffic + ' via ' + mycommute.summary;
+            } else {
+                commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute;
+            }
 
             //change color if desired and append
             if (this.config.changeColor) {
@@ -138,9 +142,9 @@ Module.register('MMM-TrafficCal', {
 
     getParams: function() {
         var params = '?';
-        params += 'mode=' + this.config.mode;
+        // params += 'mode=' + this.config.mode;
         // params += '&origin=' + this.config.origin;
-        params += '&key=' + this.config.api_key;
+        params += 'key=' + this.config.api_key;
         params += '&traffic_model=' + this.config.traffic_model;
         params += '&departure_time=now';
         params += '&language=' + this.config.language;
@@ -160,7 +164,8 @@ Module.register('MMM-TrafficCal', {
                     noTraffic: payload.noTraffics[e],
                     withTraffic: payload.withTraffics[e],
                     destination: payload.destinations[e],
-                    description: payload.descriptions[e]
+                    description: payload.descriptions[e],
+                    mode: payload.modes[e]
                     
                 });
             }
@@ -174,26 +179,33 @@ Module.register('MMM-TrafficCal', {
         this.urls = [];
         this.dests = [];
         this.descs = [];
+        this.modes = [];
         var newdest = 0;
         if (sender) {
             if (notification === 'CALENDAR_EVENTS') {
                 this.url = 'https://maps.googleapis.com/maps/api/directions/json' + this.getParams();
-                for (var e in payload) {""
+                for (var e in payload) {
                     var event = payload[e];
-                    var infos = event.description.split(":");
-                    var origin = infos[1] || this.config.origin;
-                    var description = infos[0]  || false;
                     if (event.title.substring(0,6) === this.config.tripkey) {
                         if (this.dests.indexOf(event.location) === -1) { //Prevent duplicate entries
-                            this.urls.push(this.url + '&destination=' + event.location + '&origin=' + origin );
+                            var infos = event.description.split(":");
+                            var description = infos[0]  || false;
+                            var origin = infos[1] || this.config.origin;
+                            var tmode = infos[2] || this.config.mode;
+                            this.urls.push(this.url + '&destination=' + event.location + '&origin=' + origin + '&mode=' + tmode);
                             this.dests.push(event.location);
                             this.descs.push(description);
+                            this.modes.push(tmode);
+
                         }
                     }
                 }
+
                 this.pload.push(this.urls);
                 this.pload.push(this.dests);
                 this.pload.push(this.descs);
+                this.pload.push(this.modes);
+                
                 
                 this.sendSocketNotification('TRAFFIC_URL', this.pload);
             }
