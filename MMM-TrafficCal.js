@@ -175,20 +175,18 @@ Module.register('MMM-TrafficCal', {
     notificationReceived: function(notification, payload, sender) {
         this.pload = [];
         this.urls = [];
-        this.dests = [];
         if (sender) {
             if (notification === 'CALENDAR_EVENTS') {
-                this.url = 'https://maps.googleapis.com/maps/api/directions/json' + this.getParams();
                 for (var e in payload) {
                     var event = payload[e];
                     if (event.title.substring(0,6) === this.config.tripkey) {
-                        if (this.dests.indexOf(event.location) === -1) { //Prevent duplicate entries
-                            var infos = event.description.split(":");
-                            var description = infos[0]  || event.location;
-                            var origin = infos[1] || this.config.origin;
-                            var tmode = infos[2] || this.config.mode;
-                            this.urls.push(this.url + '&destination=' + event.location + '&origin=' + origin + '&mode=' + tmode + '&comment=' + description);
-                            this.dests.push(event.location);
+                        var infos = event.description.split(":");
+                        var description = infos[0]  || event.location;
+                        var origin = infos[1] || this.config.origin;
+                        var tmode = infos[2] || this.config.mode;
+                        this.url = 'https://maps.googleapis.com/maps/api/directions/json' + this.getParams() + '&destination=' + event.location + '&origin=' + origin + '&mode=' + tmode + '&comment=' + description;
+                        if (this.urls.indexOf(this.url) === -1) { //Prevent duplicate entries
+                            this.urls.push(this.url);
                         }
                     }
                 }
