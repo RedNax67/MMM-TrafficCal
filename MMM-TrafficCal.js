@@ -142,8 +142,6 @@ Module.register('MMM-TrafficCal', {
 
     getParams: function() {
         var params = '?';
-        // params += 'mode=' + this.config.mode;
-        // params += '&origin=' + this.config.origin;
         params += 'key=' + this.config.api_key;
         params += '&traffic_model=' + this.config.traffic_model;
         params += '&departure_time=now';
@@ -177,6 +175,7 @@ Module.register('MMM-TrafficCal', {
     notificationReceived: function(notification, payload, sender) {
         this.pload = [];
         this.urls = [];
+        this.dests = [];
         if (sender) {
             if (notification === 'CALENDAR_EVENTS') {
                 this.url = 'https://maps.googleapis.com/maps/api/directions/json' + this.getParams();
