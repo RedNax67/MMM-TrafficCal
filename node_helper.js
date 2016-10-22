@@ -14,21 +14,20 @@ module.exports = NodeHelper.create({
 
     getCommute: function(payload) {
         var self = this;
-        var noTrafficValue = '';
-        var withTrafficValue = '';
         var commutes = [];
         var trafficComparisons = [];
         var summaries = [];
         var noTraffics = [];
         var withTraffics = [];
         var destinations = [];
-        var api_urls = [];
-        var descriptions = [];
+        var origins = [];
         var modes = [];
-        var reqdone = 0;
-        //console.log("Payload: " + payload);
-        
-        if (payload[0].length === 0 ) {
+        var api_urls = [];
+        var comments = [];
+        var noTrafficValue = '';
+        var withTrafficValue = '';
+
+        if (payload[0].length === 0) {
             self.sendSocketNotification('TRAFFIC_COMMUTE', {
                 'commutes': commutes,
                 'trafficComparisons': trafficComparisons,
@@ -36,91 +35,92 @@ module.exports = NodeHelper.create({
                 'noTraffics': noTraffics,
                 'withTraffics': withTraffics,
                 'destinations': destinations,
-                'descriptions': descriptions,
-                'modes': modes
-
+                'origins': origins,
+                'modes': modes,
+                'api_urls': api_urls,
+                'comments': comments
             });
-            
+
         } else {
 
-        for (var e in payload[0]) {
+            for (var e in payload[0]) {
 
-            var api_url = payload[0][e];
+            this.api_url = payload[0][e];
 
-            //console.log("api_url: " + api_url);
-            //console.log("desc: " + desc);
-            //console.log("Requesting: "  + api_url);
+                request({
+                        url: this.api_url,
+                        method: 'GET'
+                    }, function(error, response, body) {
+                        if (!error && response.statusCode == 200) {
+                            var trafficComparison = 0;
 
-            request({
-                    url: api_url,
-                    method: 'GET'
-                }, function(error, response, body) {
-                    if (!error && response.statusCode == 200) {
-                        var trafficComparison = 0;
+                            if (JSON.parse(body).status == 'OK') {
 
-                        if (JSON.parse(body).status == 'OK') {
+                                var lUrl = decodeURI(this.uri.href);
+                                var lQuery = decodeURI(this.uri.query);
 
-                            console.log("Body: "  + body);
-                            
-                            if (JSON.parse(body).routes[0].legs[0].duration_in_traffic) {
-                                var commute = JSON.parse(body).routes[0].legs[0].duration_in_traffic.text;
-                                var noTrafficValue = JSON.parse(body).routes[0].legs[0].duration.value;
-                                var withTrafficValue = JSON.parse(body).routes[0].legs[0].duration_in_traffic.value;
-                                var noTraffic = JSON.parse(body).routes[0].legs[0].duration.text;
-                                var withTraffic = JSON.parse(body).routes[0].legs[0].duration_in_traffic.text;
-                                trafficComparison = parseInt(withTrafficValue) / parseInt(noTrafficValue);
-                                var summary = JSON.parse(body).routes[0].summary;
-                                var destination = JSON.parse(body).routes[0].legs[0].end_address;
-                                var tmode = "driving";
+                                if (JSON.parse(body).routes[0].legs[0].duration_in_traffic) {
+                                    var commute = JSON.parse(body).routes[0].legs[0].duration_in_traffic.text;
+                                    var noTrafficValue = JSON.parse(body).routes[0].legs[0].duration.value;
+                                    var withTrafficValue = JSON.parse(body).routes[0].legs[0].duration_in_traffic.value;
+                                    var noTraffic = JSON.parse(body).routes[0].legs[0].duration.text;
+                                    var withTraffic = JSON.parse(body).routes[0].legs[0].duration_in_traffic.text;
+                                    var trafficComparison = parseInt(withTrafficValue) / parseInt(noTrafficValue);
+                                    var summary = JSON.parse(body).routes[0].summary;
+                                } else {
+                                    var commute = JSON.parse(body).routes[0].legs[0].duration.text;
+                                }
                             } else {
-                                var commute = JSON.parse(body).routes[0].legs[0].duration.text;
-                                var destination = JSON.parse(body).routes[0].legs[0].end_address;
-                                var tmode = "transit";
+                                var commute = JSON.parse(body).error_message;
+                                var summary = JSON.parse(body).status;
+
                             }
-                        } else {
-                            var commute = JSON.parse(body).error_message;
-                            var summary = JSON.parse(body).status;
-                            
-                        }
-
-                        commutes.push(commute);
-                        trafficComparisons.push(trafficComparison);
-                        summaries.push(summary);
-                        noTraffics.push(noTraffic);
-                        withTraffics.push(withTraffic);
-                        destinations.push(destination);
-                        modes.push(tmode);
-
-                        for (var f in payload[1]) {
-                            if (payload[1][f] === destination) {
-                                descriptions.push(payload[2][f]);
+                            var queries = lQuery.split("&");
+                            for (var f in queries) {
+                                if (queries[f].indexOf("mode=") != -1) {
+                                    modes.push(queries[f].substring(5));
+                                }
+                                if (queries[f].indexOf("comment=") != -1) {
+                                    comments.push(queries[f].substring(8));
+                                }
+                                if (queries[f].indexOf("origin=") != -1) {
+                                    origins.push(queries[f].substring(7));
+                                }
+                                if (queries[f].indexOf("destination=") != -1) {
+                                    destinations.push(queries[f].substring(12));
+                                }
                             }
+
+                            commutes.push(commute);
+                            trafficComparisons.push(trafficComparison);
+                            summaries.push(summary);
+                            noTraffics.push(noTraffic);
+                            withTraffics.push(withTraffic);
+                            api_urls.push(this.lUrl);
+
+                            if (commutes.length == payload[0].length) {
+                                self.sendSocketNotification('TRAFFIC_COMMUTE', {
+                                    'commutes': commutes,
+                                    'trafficComparisons': trafficComparisons,
+                                    'summaries': summaries,
+                                    'noTraffics': noTraffics,
+                                    'withTraffics': withTraffics,
+                                    'destinations': destinations,
+                                    'origins': origins,
+                                    'modes': modes,
+                                    'api_urls': api_urls,
+                                    'comments': comments
+                                });
+                            }
+ 
                         }
-                        
-                        console.log("TrafficCal Dest: " + destination);
-
-
-                        if (commutes.length == payload[0].length) {
-                            self.sendSocketNotification('TRAFFIC_COMMUTE', {
-                                'commutes': commutes,
-                                'trafficComparisons': trafficComparisons,
-                                'summaries': summaries,
-                                'noTraffics': noTraffics,
-                                'withTraffics': withTraffics,
-                                'destinations': destinations,
-                                'descriptions': descriptions,
-                                'modes': modes
-                            });
-                        }
-
                     }
-                }
 
 
-            );
-
+                );
+            }
         }
-        }
+
 
     },
 

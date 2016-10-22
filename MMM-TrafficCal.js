@@ -154,7 +154,7 @@ Module.register('MMM-TrafficCal', {
     socketNotificationReceived: function(notification, payload) {
         if (notification === 'TRAFFIC_COMMUTE') {
             Log.info('received TRAFFIC_COMMUTE');
-			Log.info(this.urls);
+			Log.info('TRAFFIC URLS: ' + this.urls);
             this.commute = [];
             for (e in payload.commutes) {
                 this.commute.push({
@@ -164,7 +164,7 @@ Module.register('MMM-TrafficCal', {
                     noTraffic: payload.noTraffics[e],
                     withTraffic: payload.withTraffics[e],
                     destination: payload.destinations[e],
-                    description: payload.descriptions[e],
+                    description: payload.comments[e],
                     mode: payload.modes[e]
                     
                 });
@@ -177,10 +177,6 @@ Module.register('MMM-TrafficCal', {
     notificationReceived: function(notification, payload, sender) {
         this.pload = [];
         this.urls = [];
-        this.dests = [];
-        this.descs = [];
-        this.modes = [];
-        var newdest = 0;
         if (sender) {
             if (notification === 'CALENDAR_EVENTS') {
                 this.url = 'https://maps.googleapis.com/maps/api/directions/json' + this.getParams();
@@ -189,24 +185,17 @@ Module.register('MMM-TrafficCal', {
                     if (event.title.substring(0,6) === this.config.tripkey) {
                         if (this.dests.indexOf(event.location) === -1) { //Prevent duplicate entries
                             var infos = event.description.split(":");
-                            var description = infos[0]  || false;
+                            var description = infos[0]  || event.location;
                             var origin = infos[1] || this.config.origin;
                             var tmode = infos[2] || this.config.mode;
-                            this.urls.push(this.url + '&destination=' + event.location + '&origin=' + origin + '&mode=' + tmode);
+                            this.urls.push(this.url + '&destination=' + event.location + '&origin=' + origin + '&mode=' + tmode + '&comment=' + description);
                             this.dests.push(event.location);
-                            this.descs.push(description);
-                            this.modes.push(tmode);
-
                         }
                     }
                 }
 
                 this.pload.push(this.urls);
-                this.pload.push(this.dests);
-                this.pload.push(this.descs);
-                this.pload.push(this.modes);
-                
-                
+              
                 this.sendSocketNotification('TRAFFIC_URL', this.pload);
             }
         } 
