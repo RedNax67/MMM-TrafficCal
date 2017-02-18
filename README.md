@@ -24,6 +24,10 @@ The entry in `config.js` can include the following options:
 |`loadingText`|The text used when loading the initial commute time.<br><br>**Default value:** `'Loading commute...'`|
 |`prependText`|The text used in front of the commute time.<br><br>**Default value:** `'Current commute is'`|
 |`language`|Define the commute time language.<br><br>**Example:** `en`<br>**Default value:** `config.language`|
+|`insteadofText`|Define an 'instead of' string|
+|`viaText`|Define a 'via' string|
+
+
 
 Here is an example of an entry in `config.js`
 ```
@@ -41,7 +45,10 @@ Here is an example of an entry in `config.js`
 		limitYellow: 5, //Greater than 5% of journey time due to traffic
 		limitRed: 20, //Greater than 20% of journey time due to traffic
 		traffic_model: 'pessimistic',
-		interval: 120000 //2 minutes
+		interval: 120000, //2 minutes
+        insteadofText: 'instead of',
+        viaText: 'via'
+        
 	}
 },
 ```

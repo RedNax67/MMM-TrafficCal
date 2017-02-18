@@ -20,6 +20,7 @@ module.exports = NodeHelper.create({
         var noTraffics = [];
         var withTraffics = [];
         var destinations = [];
+        var startdates = [];
         var origins = [];
         var modes = [];
         var api_urls = [];
@@ -35,6 +36,7 @@ module.exports = NodeHelper.create({
                 'noTraffics': noTraffics,
                 'withTraffics': withTraffics,
                 'destinations': destinations,
+                'startdates' : startdates,
                 'origins': origins,
                 'modes': modes,
                 'api_urls': api_urls,
@@ -46,7 +48,7 @@ module.exports = NodeHelper.create({
             for (var e in payload[0]) {
 
             this.api_url = payload[0][e];
-
+            console.log(this.api_url);
                 request({
                         url: this.api_url,
                         method: 'GET'
@@ -89,6 +91,11 @@ module.exports = NodeHelper.create({
                                 if (queries[f].indexOf("destination=") != -1) {
                                     destinations.push(queries[f].substring(12));
                                 }
+                                if (queries[f].indexOf("startDate=") != -1) {
+                                    console.log('startdate: ' + queries[f].substring(10));
+
+                                    startdates.push(queries[f].substring(10));
+                                }
                             }
 
                             commutes.push(commute);
@@ -99,6 +106,45 @@ module.exports = NodeHelper.create({
                             api_urls.push(this.lUrl);
 
                             if (commutes.length == payload[0].length) {
+
+                                var list = [];
+                                for (var j in startdates) 
+                                    list.push({ 'commute': commutes[j],
+                                                'trafficComparison': trafficComparisons[j],
+                                                'summarie': summaries[j],
+                                                'noTraffic': noTraffics[j],
+                                                'withTraffic': withTraffics[j],
+                                                'destination': destinations[j],
+                                                'startdate' : startdates[j],
+                                                'origin': origins[j],
+                                                'mode': modes[j],
+                                                'api_url': api_urls[j],
+                                                'comment': comments[j]
+                                    });
+
+                                //2) sort:
+                                list.sort(function(a, b) {
+                                    return ((a.startdate < b.startdate) ? -1 : ((a.startdate == b.startdate) ? 0 : 1));
+                                    //Sort could be modified to, for example, sort on the age 
+                                    // if the name is the same.
+                                });
+
+                                //3) separate them back out:
+                                for (var k = 0; k < list.length; k++) {
+                                    commutes[k] = list[k].commute;
+                                    trafficComparisons[k] = list[k].trafficComparison;
+                                    summaries[k] = list[k].summarie;
+                                    noTraffics[k] = list[k].noTraffic;
+                                    withTraffics[k] = list[k].withTraffic;
+                                    destinations[k] = list[k].destination;
+                                    startdates[k] = list[k].startdate;
+                                    origins[k] = list[k].origin;
+                                    modes[k] = list[k].mode;
+                                    api_urls[k] = list[k].api_url;
+                                    comments[k] = list[k].comment;
+                                }
+
+                                
                                 self.sendSocketNotification('TRAFFIC_COMMUTE', {
                                     'commutes': commutes,
                                     'trafficComparisons': trafficComparisons,
@@ -106,6 +152,7 @@ module.exports = NodeHelper.create({
                                     'noTraffics': noTraffics,
                                     'withTraffics': withTraffics,
                                     'destinations': destinations,
+                                    'startdates' : startdates,
                                     'origins': origins,
                                     'modes': modes,
                                     'api_urls': api_urls,

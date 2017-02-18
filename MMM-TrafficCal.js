@@ -21,6 +21,8 @@ Module.register('MMM-TrafficCal', {
         departure_time: 'now',
         loadingText: 'Loading commute...',
         prependText: 'Current commute is',
+        insteadofText: 'ipv',
+        viaText: 'via',
         changeColor: false,
         limitYellow: 10,
         limitRed: 30,
@@ -115,7 +117,7 @@ Module.register('MMM-TrafficCal', {
             var commuteCell = document.createElement("td");
             //commuteCell.className = "c";
             if (mycommute.noTraffic) {
-                commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute + ' ipv ' + mycommute.noTraffic + ' via ' + mycommute.summary;
+                commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute + ' ' + insteadofText + ' ' + mycommute.noTraffic + ' ' + viaText + ' ' + mycommute.summary;
             } else {
                 commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute;
             }
@@ -184,7 +186,7 @@ Module.register('MMM-TrafficCal', {
                         var description = infos[0]  || event.location;
                         var origin = infos[1] || this.config.origin;
                         var tmode = infos[2] || this.config.mode;
-                        this.url = 'https://maps.googleapis.com/maps/api/directions/json' + this.getParams() + '&destination=' + event.location + '&origin=' + origin + '&mode=' + tmode + '&comment=' + description;
+                        this.url = 'https://maps.googleapis.com/maps/api/directions/json' + this.getParams() + '&destination=' + event.location + '&origin=' + origin + '&mode=' + tmode + '&comment=' + description + '&startDate=' + event.startDate;
                         if (this.urls.indexOf(this.url) === -1) { //Prevent duplicate entries
                             this.urls.push(this.url);
                         }
