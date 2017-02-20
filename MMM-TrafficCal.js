@@ -117,7 +117,7 @@ Module.register('MMM-TrafficCal', {
             var commuteCell = document.createElement("td");
             //commuteCell.className = "c";
             if (mycommute.noTraffic) {
-                commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute + ' ' + insteadofText + ' ' + mycommute.noTraffic + ' ' + viaText + ' ' + mycommute.summary;
+                commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute + ' ' + this.config.insteadofText + ' ' + mycommute.noTraffic + ' ' + this.config.viaText + ' ' + mycommute.summary;
             } else {
                 commuteCell.innerHTML = mycommute.description + ' ' + mycommute.commute;
             }
